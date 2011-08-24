@@ -1,6 +1,7 @@
 import json
 import urllib
 import urllib2
+from datetime import datetime
 
 def configure(nickname, key):
     SmugMugClient.NICKNAME = nickname
@@ -25,6 +26,10 @@ class SmugMugClient(object):
         if data['stat'] != 'ok':
             raise Exception("Error with api endpoint %s. Got %s" % (api_endpoint, data))
         return data
+    
+    @property
+    def modified_at(self):
+        return datetime.strptime(self.details['LastUpdated'], '%Y-%m-%d %H:%M:%S')
 
 
 class Image(SmugMugClient):
@@ -77,7 +82,6 @@ class Image(SmugMugClient):
         return "<Image %s %s>" % (self.smug_id, self.url)
 
 
-
 class Album(SmugMugClient):
     def __init__(self, title, key, smug_id, album_password):
         self.title = title
@@ -102,6 +106,12 @@ class Album(SmugMugClient):
             _albums.append(album)
         return _albums
 
+    @classmethod
+    def get(self, album_name, album_password):
+        for album in self.list(album_password):
+            if album.title == album_name:
+                return album
+
     @property
     def details(self):
         if self._details is None:
@@ -115,8 +125,3 @@ class Album(SmugMugClient):
     def images(self):
         return Image.list(self)
 
-        
-
-        
-        
-        

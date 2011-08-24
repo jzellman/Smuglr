@@ -1,6 +1,8 @@
+import sys
 import os
 import shelve
 import multiprocessing
+import time
 
 import smugmug
 
@@ -21,11 +23,16 @@ def shelf_key(obj):
     """
     return "{}-{}".format(obj.__class__.__name__, obj.smug_id)
 
+def set_modified(path, datetime):
+    atime = mtime = time.mktime(datetime.timetuple())
+    os.utime(path, (atime, mtime))
+
 def sync_album(args):
     # TODO - is there a better way to support multiple args
     # when usage is with map?
     folder = args[0]
     album = args[1]
+    print album
 
     shelf = shelve.open(os.path.join(folder, ".smugler"))
     try:
@@ -40,26 +47,56 @@ def sync_album(args):
         if album_shelf_key not in shelf or force_download:
             shelf[album_shelf_key] = album_path
             makedir(album_path)
+            set_modified(album_path, album.modified_at)
     
         for image in album.images():
+            image_path = os.path.join(folder, image.album.title, image.file_name)
             image_shelf_key = shelf_key(image)
             if image_shelf_key not in shelf or force_download:
-                image_path = os.path.join(folder, image.album.title, image.file_name)
                 with open(image_path, "wb") as f:
                     print "Saving image to", image_path
                     f.write(image.data)
+                    set_modified(image_path, image.modified_at)
                     shelf[image_shelf_key] = image_path
+
     finally:
         shelf.close()
 
 if __name__ == "__main__":
-    folder = os.path.expanduser("~/Pictures/Smugler")
-    print "Using folder", folder
-    makedir(folder)
     
-    smugmug.configure("zellman", "1vKws3yfpiziQCjBvkg6NeD7bI5oTzDl")
+    try:
+        action = sys.argv[1]
+    except IndexError:
+        action = None
 
-    albums = [ (folder, a) for a in smugmug.Album.list('bigwill')]
+    actions = ["albums", "sync-album", "sync"]
+    if action not in actions:
+        print "Usage python {} <command ({})> <options>".format(sys.argv[0], ", ".join(actions))
+        sys.exit(0)
+        
+    account = 'zellman'
+    api_key = '1vKws3yfpiziQCjBvkg6NeD7bI5oTzDl'
+    password = 'bigwill'
+    smugmug.configure(account, api_key)
 
-    pool = multiprocessing.Pool(10)
-    pool.map(sync_album, albums)
+    if action == "albums":
+        for album in smugmug.Album.list(password):
+            print album.title
+        sys.exit(0)
+
+    folder = os.path.expanduser(os.path.join("~/Pictures/Smugler", account))
+    print "Using directory", folder
+    makedir(folder)
+
+    if action == "sync-album":
+        album_name = sys.argv[2]
+        print "Syncing album", album_name
+        album = smugmug.Album.get(album_name, password)
+        if not album:
+            "Album not found"
+            sys.exit(0)
+        sync_album([folder, album])
+    else:
+        albums = [ (folder, a) for a in smugmug.Album.list(password)]
+        pool = multiprocessing.Pool(10)
+        pool.map(sync_album, albums)
