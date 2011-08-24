@@ -1,100 +1,65 @@
-import urllib
-import urllib2
-import json
+import os
+import shelve
+import multiprocessing
 
+import smugmug
 
-class Smugler(object):
-    URL = 'https://secure.smugmug.com/services/api/json/1.3.0/' 
-    def __init__(self, nickname, key):
-        self.nickname = nickname
-        self.key = key
-        self.decoder = json.JSONDecoder()
+def makedir(path):
+    """
+    Try creating a directory, catch exception (directory already exists)
+    """
+    
+    try:
+        print "Creating directory", path
+        os.makedirs(path)
+    except OSError:
+        pass
 
-    def images(self, album, password=None):
-        def image_url(image):
-            return self.make_request("smugmug.images.getURLs",
-                                     params = {'ImageID': image.smug_id,
-                                               'ImageKey': image.key,
-                                               'Password': password}
-                                     )['Image']['OriginalURL']
-            
-        
-        _images = []
-        for i_data in self.make_request('smugmug.images.get',
-                                        params={"AlbumID": album.smug_id,
-                                                "AlbumKey": album.key,
-                                                'Password': password})['Album']['Images']:
-            i = Image(album, i_data['Key'], i_data['id'])
-            i.url = image_url(i)
-            return [i]
-            _images.append(i)
+def shelf_key(obj):
+    """
+    Returns a key that is safe for shelfing
+    """
+    return "{}-{}".format(obj.__class__.__name__, obj.smug_id)
 
-        return _images
-        
+def sync_album(args):
+    # TODO - is there a better way to support multiple args
+    # when usage is with map?
+    folder = args[0]
+    album = args[1]
 
-    def albums(self):
-        _albums = []
-        for album_data in self.make_request('smugmug.albums.get')['Albums']:
-            category = Category(album_data['Category']['Name'], album_data['Category']['id'])
-            _albums.append(Album(album_data['Title'], album_data['Key'],
-                                album_data['id'], category))
-        return _albums
+    shelf = shelve.open(os.path.join(folder, ".smugler"))
+    try:
 
-    def make_request(self, api_endpoint, **kwargs):
-        params = kwargs.get("params", {})
-        params.update({"NickName": self.nickname,
-                       "APIKey": self.key,
-                       "method": api_endpoint})
-        params = urllib.urlencode(params)
-        request = urllib2.Request(self.URL, params)
-        data = self.decoder.decode(urllib2.urlopen(request).read())
-        if data['stat'] != 'ok':
-            raise Exception("Error with api endpoint %s. Got %s" % (api_endpoint, data))
-        return data
+        album_path = os.path.join(folder, album.title)
+        album_shelf_key = shelf_key(album)
 
-class Image(object):
-    def __init__(self, album, key, smug_id):
-        self.url = None
-        self.album = album
-        self.key = key
-        self.smug_id = smug_id
-    def __repr__(self):
-        return "<Image %s %s>" % (self.smug_id, self.url)
+        # the folder does not exist on disk but the shelf key does
+        # exist. Someone probably deleted the album folder, re-download
+        force_download = not os.path.exists(album_path) and album_shelf_key in shelf
 
-    def image(self):
-        return urllib.urlopen(self.url).read()
-
-class Category(object):
-    def __init__(self, name, smug_id):
-        self.name = name
-        self.smug_id = smug_id
-
-    def __repr__(self):
-        return "<Category %s>" % self.name
-
-class Album(object):
-    def __init__(self, title, key, smug_id, category):
-        self.title = title
-        self.key = key
-        self.smug_id = smug_id
-        self.category = category
-
-    def __repr__(self):
-        return "<Album %s %s>" % (self.title, self.key)
-
-
+        if album_shelf_key not in shelf or force_download:
+            shelf[album_shelf_key] = album_path
+            makedir(album_path)
+    
+        for image in album.images():
+            image_shelf_key = shelf_key(image)
+            if image_shelf_key not in shelf or force_download:
+                image_path = os.path.join(folder, image.album.title, image.file_name)
+                with open(image_path, "wb") as f:
+                    print "Saving image to", image_path
+                    f.write(image.data)
+                    shelf[image_shelf_key] = image_path
+    finally:
+        shelf.close()
 
 if __name__ == "__main__":
-    s = Smugler("zellman", "1vKws3yfpiziQCjBvkg6NeD7bI5oTzDl")
-    from pprint import pprint
-    albums = s.albums()
-    album = [a for a in albums if a.key == 'bW3m7g'][0]
-    print album
-    for i in s.images(album, 'bigwill'):
-        print i.url
-#        with open('%s_%s.jpg' % (album.key, i.key), 'w') as f:
-#            f.write(i.image())
-#
+    folder = os.path.expanduser("~/Pictures/Smugler")
+    print "Using folder", folder
+    makedir(folder)
     
+    smugmug.configure("zellman", "1vKws3yfpiziQCjBvkg6NeD7bI5oTzDl")
 
+    albums = [ (folder, a) for a in smugmug.Album.list('bigwill')]
 
+    pool = multiprocessing.Pool(10)
+    pool.map(sync_album, albums)
