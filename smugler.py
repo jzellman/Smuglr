@@ -24,10 +24,18 @@ def shelf_key(obj):
     return "{}-{}".format(obj.__class__.__name__, obj.smug_id)
 
 def set_modified(path, datetime):
+    """
+    Sets the atime and mtime for the particular path 
+    """
     atime = mtime = time.mktime(datetime.timetuple())
     os.utime(path, (atime, mtime))
 
 def sync_album(args):
+    """
+    Syncs album with local file system folder
+    arg[0] represents the folder
+    arg[1] represents the album
+    """
     # TODO - is there a better way to support multiple args
     # when usage is with map?
     folder = args[0]
