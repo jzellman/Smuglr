@@ -68,7 +68,7 @@ class Image(SmugMugClient):
         result = self.make_request('smugmug.images.get',
                                    params={"AlbumID": album.smug_id,
                                            "AlbumKey": album.key,
-                                           'Password': album.album_password})
+                                           'SitePassword': album.album_password})
         
         for i_data in result['Album']['Images']:
             i = Image(album, i_data['id'], i_data['Key'])
@@ -85,7 +85,7 @@ class Image(SmugMugClient):
             result = self.make_request("smugmug.images.getInfo",
                                        params = {'ImageID': self.smug_id,
                                                  'ImageKey': self.key,
-                                                 'Password': self.album.album_password})
+                                                 'SitePassword': self.album.album_password})
             self._details = result['Image']
         return self._details
 
@@ -141,13 +141,15 @@ class Album(SmugMugClient):
         Returns a list of albums stored on SmugMug. Only supports 1 album password
         """
         _albums = []
-        for album_data in self.make_request('smugmug.albums.get')['Albums']:
+
+        album_dicts = self.make_request('smugmug.albums.get',
+                                        params={'SitePassword': album_password})['Albums']
+        for album_data in album_dicts:
             #category = Category(album_data['Category']['Name'], album_data['Category']['id'])
             album = Album(album_data['Title'], album_data['Key'], album_data['id'], album_password)
-
-            if not album.details["External"]:
-                raise Exception("{} is not external linkable".format(album.title))
-                
+            # This check is slow
+            # if not album.details["External"]:
+            #    raise Exception("{} is not external linkable".format(album.title))
             _albums.append(album)
         return _albums
 
@@ -169,7 +171,7 @@ class Album(SmugMugClient):
             self._details = self.make_request('smugmug.albums.getInfo',
                                               params = { "AlbumID": self.smug_id,
                                                          "AlbumKey": self.key,
-                                                         "Password": self.album_password
+                                                         "SitePassword": self.album_password
                                                          })["Album"]
         return self._details
 

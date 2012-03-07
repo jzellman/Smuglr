@@ -3,6 +3,7 @@ import os
 import shelve
 import multiprocessing
 import time
+from optparse import OptionParser
 
 import smugmug
 
@@ -71,20 +72,28 @@ def sync_album(args):
         shelf.close()
 
 if __name__ == "__main__":
-    
+    actions = ["albums", "sync-album", "sync"]
+
+    parser = OptionParser(usage="usage: %prog [command ({}) [options] [args]".format(", ".join(actions)))
+    parser.add_option("-a", "--account", dest="account",
+                      help="Name of the SmugMug account")
+    parser.add_option("-p", "--password", dest="password",
+                      help="Site password for the SmugMug account", default="")
+
+
+    actions = ["albums", "sync-album", "sync"]
     try:
         action = sys.argv[1]
     except IndexError:
         action = None
-
-    actions = ["albums", "sync-album", "sync"]
-    if action not in actions:
-        print "Usage python {} <command ({})> <options>".format(sys.argv[0], ", ".join(actions))
+    (options, args) = parser.parse_args(sys.argv[2:])
+    if not options.account or action not in actions:
+        print parser.print_help()
         sys.exit(0)
-        
-    account = 'zellman'
+
+    account = options.account
     api_key = '1vKws3yfpiziQCjBvkg6NeD7bI5oTzDl'
-    password = 'bigwill'
+    password = options.password
     smugmug.configure(account, api_key)
 
     if action == "albums":
@@ -97,7 +106,7 @@ if __name__ == "__main__":
     makedir(folder)
 
     if action == "sync-album":
-        album_name = sys.argv[2]
+        album_name = args[0]
         print "Syncing album", album_name
         album = smugmug.Album.get(album_name, password)
         if not album:
