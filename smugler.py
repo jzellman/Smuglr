@@ -95,7 +95,6 @@ if __name__ == "__main__":
     api_key = '1vKws3yfpiziQCjBvkg6NeD7bI5oTzDl'
     password = options.password
     smugmug.configure(account, api_key)
-
     if action == "albums":
         for album in smugmug.Album.list(password):
             print album.title
