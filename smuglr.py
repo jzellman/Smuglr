@@ -43,7 +43,7 @@ def sync_album(args):
     album = args[1]
     print album
 
-    shelf = shelve.open(os.path.join(folder, ".smugler"))
+    shelf = shelve.open(os.path.join(folder, ".smuglr"))
     try:
 
         album_path = os.path.join(folder, album.title)
@@ -100,7 +100,7 @@ if __name__ == "__main__":
             print album.title
         sys.exit(0)
 
-    folder = os.path.expanduser(os.path.join("~/Pictures/Smugler", account))
+    folder = os.path.expanduser(os.path.join("~/Pictures/Smuglr", account))
     print "Using directory", folder
     makedir(folder)
 
