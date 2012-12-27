@@ -33,12 +33,12 @@ class SmugMugClient(object):
         request = urllib2.Request(self.URL, params)
         decoder = json.JSONDecoder()
         data = decoder.decode(urllib2.urlopen(request).read())
-        
+
         if data['stat'] != 'ok':
             raise Exception("Error with api endpoint {}. Got {}".
                             format(api_endpoint, data))
         return data
-    
+
     @property
     def modified_at(self):
         """
@@ -52,6 +52,7 @@ class Image(SmugMugClient):
     Represents an Image or Video(SmugMug does not decipher between the 2)
     on the SmugMug service
     """
+
     def __init__(self, album, smug_id, key):
         self._details = None
         self.album = album
@@ -69,7 +70,7 @@ class Image(SmugMugClient):
                                    params={"AlbumID": album.smug_id,
                                            "AlbumKey": album.key,
                                            'SitePassword': album.album_password})
-        
+
         for i_data in result['Album']['Images']:
             i = Image(album, i_data['id'], i_data['Key'])
             _images.append(i)
@@ -80,7 +81,7 @@ class Image(SmugMugClient):
         """
         Lazy dict of Image details
         """
-        
+
         if self._details is None:
             result = self.make_request("smugmug.images.getInfo",
                                        params = {'ImageID': self.smug_id,
@@ -101,20 +102,28 @@ class Image(SmugMugClient):
     @property
     def url(self):
         """
-        Returns the original res image url or the high res video url 
+        Returns the highest res image url or the high res video url
         """
 
         if 'Video960URL' in self.details:
             return self.details['Video960URL']
-        else:
-            return self.details['OriginalURL']
+
+
+        # Image keys from largest to smallest
+        IMAGE_KEYS = ['OriginalURL', 'X2LargeURL', 'XLargeURL', 'LargeURL',
+                      'MediumURL', 'SmallURL', 'TinyURL']
+
+        for image_key in IMAGE_KEYS:
+            if image_key in self.details:
+                return self.details[image_key]
+        raise Exception("Could not find video or image key in %s" % self.details)
 
     @property
     def file_name(self):
         """
         Returns the filename
         """
-        
+
         return self.details['FileName']
 
     def __repr__(self):
@@ -165,7 +174,7 @@ class Album(SmugMugClient):
     @property
     def details(self):
         """
-        Lazy loaded album details 
+        Lazy loaded album details
         """
         if self._details is None:
             self._details = self.make_request('smugmug.albums.getInfo',
@@ -180,4 +189,3 @@ class Album(SmugMugClient):
         Returns list of images for Album
         """
         return Image.list(self)
-
