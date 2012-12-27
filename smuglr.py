@@ -11,7 +11,7 @@ def makedir(path):
     """
     Try creating a directory, catch exception (directory already exists)
     """
-    
+
     try:
         print "Creating directory", path
         os.makedirs(path)
@@ -26,7 +26,7 @@ def shelf_key(obj):
 
 def set_modified(path, datetime):
     """
-    Sets the atime and mtime for the particular path 
+    Sets the atime and mtime for the particular path
     """
     atime = mtime = time.mktime(datetime.timetuple())
     os.utime(path, (atime, mtime))
@@ -57,7 +57,7 @@ def sync_album(args):
             shelf[album_shelf_key] = album_path
             makedir(album_path)
             set_modified(album_path, album.modified_at)
-    
+
         for image in album.images():
             image_path = os.path.join(folder, image.album.title, image.file_name)
             image_shelf_key = shelf_key(image)
@@ -76,10 +76,12 @@ if __name__ == "__main__":
 
     parser = OptionParser(usage="usage: %prog [command ({}) [options] [args]".format(", ".join(actions)))
     parser.add_option("-a", "--account", dest="account",
-                      help="Name of the SmugMug account")
+                      help="Name of the SmugMug account.")
     parser.add_option("-p", "--password", dest="password",
-                      help="Site password for the SmugMug account", default="")
-
+                      help="Site password for the SmugMug account.", default="")
+    parser.add_option("-s", "--single", action="store_true",
+                      dest="single_threaded",
+                      help="Sync albums in a single thread. This is slower, but may be beneficial in debugging problems. Only used with 'sync' command.")
 
     actions = ["albums", "sync-album", "sync"]
     try:
@@ -109,10 +111,14 @@ if __name__ == "__main__":
         print "Syncing album", album_name
         album = smugmug.Album.get(album_name, password)
         if not album:
-            "Album not found"
+            print "Album not found"
             sys.exit(0)
         sync_album([folder, album])
     else:
         albums = [ (folder, a) for a in smugmug.Album.list(password)]
-        pool = multiprocessing.Pool(10)
-        pool.map(sync_album, albums)
+        if options.single_threaded:
+            for album in albums:
+                sync_album(album)
+        else:
+            pool = multiprocessing.Pool(10)
+            pool.map(sync_album, albums)
