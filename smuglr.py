@@ -1,7 +1,7 @@
 import sys
 import os
 import shelve
-import multiprocessing
+from multiprocessing import cpu_count, Pool
 import time
 from optparse import OptionParser
 
@@ -81,7 +81,7 @@ if __name__ == "__main__":
                       help="Site password for the SmugMug account.", default="")
     parser.add_option("-s", "--single", action="store_true",
                       dest="single_threaded",
-                      help="Sync albums in a single thread. This is slower, but may be beneficial in debugging problems. Only used with 'sync' command.")
+                      help="Sync albums in a single thread instead of using all cpus (%d). This is slower, but may be beneficial in debugging problems. Only used with 'sync' command." % cpu_count())
 
     actions = ["albums", "sync-album", "sync"]
     try:
@@ -120,5 +120,5 @@ if __name__ == "__main__":
             for album in albums:
                 sync_album(album)
         else:
-            pool = multiprocessing.Pool(10)
+            pool = Pool(cpu_count())
             pool.map(sync_album, albums)
