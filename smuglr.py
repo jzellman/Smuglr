@@ -1,8 +1,10 @@
 import sys
 import os
 import shelve
-from multiprocessing import cpu_count, Pool
+import signal
 import time
+
+from multiprocessing import cpu_count, Pool
 from optparse import OptionParser
 
 import smugmug
@@ -121,4 +123,4 @@ if __name__ == "__main__":
                 sync_album(album)
         else:
             pool = Pool(cpu_count())
-            pool.map(sync_album, albums)
+            pool.map_async(sync_album, albums).get(9999999)
