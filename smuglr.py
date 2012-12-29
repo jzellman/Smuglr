@@ -85,6 +85,10 @@ if __name__ == "__main__":
                       dest="single_threaded",
                       help="Sync albums in a single thread instead of using all cpus (%d). This is slower, but may be beneficial in debugging problems. Only used with 'sync' command." % cpu_count())
 
+    parser.add_option("-d", "--directory", dest="directory",
+                      default=None,
+                      help="Specify the output directory for albums. Default is '~/Pictures/Smuglr/<account_name>/'")
+
     actions = ["albums", "sync-album", "sync"]
     try:
         action = sys.argv[1]
@@ -104,7 +108,11 @@ if __name__ == "__main__":
             print album.title
         sys.exit(0)
 
-    folder = os.path.expanduser(os.path.join("~/Pictures/Smuglr", account))
+    if options.directory:
+        folder_path = options.directory
+    else:
+        folder_path = os.path.join("~/Pictures/Smuglr", account)
+    folder = os.path.expanduser(folder_path)
     print "Using directory", folder
     makedir(folder)
 
