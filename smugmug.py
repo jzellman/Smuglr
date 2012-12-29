@@ -54,7 +54,6 @@ class Image(SmugMugClient):
     """
 
     def __init__(self, album, smug_id, key):
-        self._details = None
         self.album = album
         self.key = key
         self.smug_id = smug_id
@@ -96,7 +95,7 @@ class Image(SmugMugClient):
         Lazy loaded image data
         """
         if self._data is None:
-            self._data = urllib.urlopen(self.url).read()
+            self._data = urllib.urlopen(self.url.encode('utf-8')).read()
         return self._data
 
     @property
@@ -127,7 +126,7 @@ class Image(SmugMugClient):
         return self.details['FileName']
 
     def __repr__(self):
-        return "<Image %s %s>" % (self.smug_id, self.url)
+        return "<Image %s %s>" % (self.smug_id, self.url.encode('utf-8'))
 
 
 class Album(SmugMugClient):
@@ -142,7 +141,7 @@ class Album(SmugMugClient):
         self._details = None
 
     def __repr__(self):
-        return "<Album %s %s>" % (self.title, self.key)
+        return "<Album %s %s>" % (self.title.encode('utf-8'), self.key)
 
     @classmethod
     def list(self, album_password):
