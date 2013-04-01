@@ -15,7 +15,7 @@ def makedir(path):
     """
 
     try:
-        print "Creating directory", path
+        print "Creating directory", path.encode('utf-8')
         os.makedirs(path)
     except OSError:
         pass
@@ -43,7 +43,7 @@ def sync_album(args):
     # when usage is with map?
     folder = args[0]
     album = args[1]
-    print album
+    print album.encode('utf-8')
 
     shelf = shelve.open(os.path.join(folder, ".smuglr"))
     try:
@@ -65,7 +65,7 @@ def sync_album(args):
             image_shelf_key = shelf_key(image)
             if image_shelf_key not in shelf or force_download:
                 with open(image_path, "wb") as f:
-                    print "Saving image to", image_path
+                    print "Saving image to", image_path.encode('utf-8')
                     f.write(image.data)
                     set_modified(image_path, image.modified_at)
                     shelf[image_shelf_key] = image_path
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     smugmug.configure(account, api_key)
     if action == "albums":
         for album in smugmug.Album.list(password):
-            print album.title
+            print album.title.encode('utf-8')
         sys.exit(0)
 
     if options.directory:
@@ -113,12 +113,12 @@ if __name__ == "__main__":
     else:
         folder_path = os.path.join("~/Pictures/Smuglr", account)
     folder = os.path.expanduser(folder_path)
-    print "Using directory", folder
+    print "Using directory", folder.encode('utf-8')
     makedir(folder)
 
     if action == "sync-album":
         album_name = args[0]
-        print "Syncing album", album_name
+        print "Syncing album", album_name.encode('utf-8')
         album = smugmug.Album.get(album_name, password)
         if not album:
             print "Album not found"
