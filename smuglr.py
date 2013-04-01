@@ -43,7 +43,7 @@ def sync_album(args):
     # when usage is with map?
     folder = args[0]
     album = args[1]
-    print album.encode('utf-8')
+    print album.title.encode('utf-8')
 
     shelf = shelve.open(os.path.join(folder, ".smuglr"))
     try:
