@@ -1,0 +1,19 @@
+{
+   "stat" : "ok",
+   "method" : "smugmug.images.get",
+   "Album" : {
+      "Images" : [
+         {
+            "id" : 1,
+            "Key" : "image-1"
+         },
+         {
+            "Key" : "video-2",
+            "id" : 2
+         }
+      ],
+      "Key" : "album-1",
+      "ImageCount" : 2,
+      "id" : 1
+   }
+}

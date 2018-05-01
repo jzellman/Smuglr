@@ -1,0 +1,35 @@
+{
+    "stat": "ok",
+    "method": "smugmug.images.getInfo",
+    "Image": {
+        "id": 1,
+        "Key": "image-1",
+        "Album": {
+            "id": 1,
+            "Key": "album-1",
+            "URL": "https://test-nickname.smugmug.com/Family/album-1"
+        },
+        "Type": "Album",
+        "URL": "https://test-nickname.smugmug.com/Family/album-1/i-asdfasdf",
+        "LightboxURL": "https://test-nickname.smugmug.com/Family/album-1/i-asdfasdf/A",
+        "TinyURL": "https://test-nickname.smugmug.com/Family/album-1/i-asdfasdf/0/42424242/Ti/image-Ti.jpg",
+        "ThumbURL": "https://test-nickname.smugmug.com/Family/album-1/i-asdfasdf/0/42424242/Th/image-Th.jpg",
+        "SmallURL": "https://test-nickname.smugmug.com/Family/album-1/i-asdfasdf/0/42424242/S/image-S.jpg",
+        "MediumURL": "https://test-nickname.smugmug.com/Family/album-1/i-asdfasdf/0/42424242/M/image-M.jpg",
+        "LargeURL": "https://test-nickname.smugmug.com/Family/album-1/i-asdfasdf/0/42424242/L/image-L.jpg",
+        "XLargeURL": "https://test-nickname.smugmug.com/Family/album-1/i-asdfasdf/0/42424242/XL/image-XL.jpg",
+        "X2LargeURL": "https://test-nickname.smugmug.com/Family/album-1/i-asdfasdf/0/42424242/X2/image-X2.jpg",
+        "X3LargeURL": "https://test-nickname.smugmug.com/Family/album-1/i-asdfasdf/0/42424242/X3/image-X3.jpg",
+        "OriginalURL": "https://test-nickname.smugmug.com/Family/album-1/i-asdfasdf/0/42424242/O/image.jpg",
+        "Caption": "",
+        "FileName": "image.jpeg",
+        "Format": "JPG",
+        "Height": 1804,
+        "Keywords": "",
+        "LastUpdated": "2014-04-21 18:40:23",
+        "Position": 1,
+        "Serial": 0,
+        "Size": 2311396,
+        "Width": 2706
+    }
+}

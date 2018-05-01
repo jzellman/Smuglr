@@ -1,0 +1,24 @@
+{
+   "method" : "smugmug.albums.get",
+   "Albums" : [
+      {
+         "id" : 1,
+         "Category" : {
+            "id" : 42,
+            "Name" : "Homepage"
+         },
+         "Title" : "Album 1",
+         "Key" : "album-1"
+      },
+      {
+         "Title" : "Album 2",
+         "Key" : "album-2",
+         "id" : 2,
+         "Category" : {
+            "id" : 42,
+            "Name" : "Homepage"
+         }
+      }
+   ],
+   "stat" : "ok"
+}

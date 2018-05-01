@@ -1,0 +1,42 @@
+{
+    "stat": "ok",
+    "method": "smugmug.images.getInfo",
+    "Image": {
+        "id": 2,
+        "Key": "video-2",
+        "Album": {
+            "id": 1,
+            "Key": "album-1",
+            "URL": "https://test-nickname.smugmug.com/album-1"
+        },
+        "Type": "Album",
+        "URL": "https://test-nickname.smugmug.com/album-1/i-4418Qs",
+        "LightboxURL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/A",
+        "TinyURL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/Ti/VIDEO-Ti.jpg",
+        "ThumbURL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/Th/VIDEO-Th.jpg",
+        "SmallURL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/S/VIDEO-S.jpg",
+        "MediumURL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/M/VIDEO-M.jpg",
+        "LargeURL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/L/VIDEO-L.jpg",
+        "XLargeURL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/XL/VIDEO-XL.jpg",
+        "X2LargeURL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/X2/VIDEO-X2.jpg",
+        "X3LargeURL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/X3/VIDEO-X3.jpg",
+        "Duration": 220.085,
+        "Video320URL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/320/VIDEO-320.mp4",
+        "Video640URL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/640/VIDEO-640.mp4",
+        "Video960URL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/960/VIDEO-960.mp4",
+        "Video1280URL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/1280/VIDEO-1280.mp4",
+        "VideoSMILURL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/SMIL/VIDEO-SMIL.smil",
+        "VideoStreamingURL": "https://videos.smugmug.com/album-1/i-4418Qs/0/SMIL/smbn8Qs.smil/master.m3u8",
+        "OriginalURL": "https://test-nickname.smugmug.com/album-1/i-4418Qs/0/asdfasdf/O/VIDEO.jpg",
+        "Caption": "",
+        "FileName": "VIDEO.MP4",
+        "Format": "MP4",
+        "Height": 720,
+        "Keywords": "",
+        "LastUpdated": "2016-02-10 07:21:45",
+        "Position": 1,
+        "Serial": 0,
+        "Size": 452289,
+        "Width": 1280
+    }
+}
