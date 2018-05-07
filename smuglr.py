@@ -16,6 +16,9 @@ BASE_URL = 'https://secure.smugmug.com/services/api/json/1.3.0/'
 
 
 class Client:
+    '''
+    Fetches data from SmugMug.
+    '''
     def __init__(self, api_key, nickname,
                  site_password=None,
                  album_passwords=None):
@@ -25,6 +28,10 @@ class Client:
         self.album_passwords = album_passwords or {}
 
     def fetch(self, api_endpoint, params=None, album_password=None):
+        '''
+        Makes a request to SmugMug and returns a dictionary or list
+        of the parsed response body.
+        '''
         base_params = {
             'NickName': self.nickname,
             'APIKey': self.api_key,
@@ -51,6 +58,7 @@ class Client:
         return datetime.datetime.strptime(timestr, '%Y-%m-%d %H:%M:%S')
 
     def fetch_albums(self):
+        'Returns a list of albums for the SmugMug account'
         data = self.fetch('smugmug.albums.get')
         return [{
             'title': album_data['Title'],
@@ -59,6 +67,10 @@ class Client:
         } for album_data in data['Albums']]
 
     def fetch_album_image_ids(self, album):
+        '''
+        Returns a list of dictionaries containing the image/video id,
+        it's key, and it's album
+        '''
         album_password = self.album_passwords.get(album['title'])
 
         print(f'Fetching image ids for album {album}.')
@@ -83,6 +95,7 @@ class Client:
                 return data[url_key]
 
     def fetch_image(self, image):
+        'Returns a dictionary of the metadata for a particular image or video'
         album_password = self.album_passwords.get(image['album']['title'])
         data = self.fetch(
             'smugmug.images.getInfo',
@@ -126,6 +139,7 @@ class Client:
 
 
 def download_image(client, image):
+    'Download a particular image/video from SmugMug and save to disk'
     image = client.fetch_image(image)
     album_dir = image['album']['directory']
     filepath = os.path.join(album_dir,  image['filename'])
@@ -139,6 +153,7 @@ def download_image(client, image):
 
 
 def download(client, directory, album_names=None):
+    'Download and save to disk all images and videos for provided album_names'
     # make destination directory
     safe_mkdir(directory)
 
